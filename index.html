@@ -19,7 +19,7 @@
     --purple:#5B3E8C; --purple-lt:#E8E0F2;
     --ink:#1c2430; --paper:#F6F8FB; --line:#DDE4EE;
     --card:#FFFFFF; --muted:#6b7688; --danger:#B3413A;
-    --radius:12px;
+    --radius:4px;
     --sat: env(safe-area-inset-top, 0px);
     --sab: env(safe-area-inset-bottom, 0px);
     font-family: "Inter", "Segoe UI", system-ui, sans-serif;
@@ -34,17 +34,17 @@
     position:sticky; top:0; z-index:20;
   }
   header .brand{display:flex; align-items:center; gap:10px;}
-  header .brand .logo{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;}
+  header .brand .logo{width:34px;height:34px;border-radius:3px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;}
   header h1{margin:0;font-size:16px;letter-spacing:.2px;line-height:1.2;}
   header .sub{font-size:11px;opacity:.75;margin-top:1px;}
-  #connStatus{font-size:11px;padding:5px 10px;border-radius:20px;background:rgba(255,255,255,.15);white-space:nowrap;}
+  #connStatus{font-size:11px;padding:5px 10px;border-radius:4px;background:rgba(255,255,255,.15);white-space:nowrap;}
   #connStatus.ok{background:#2f8f5b;}
   #connStatus.err{background:#b3413a;}
 
   nav.tabs{display:flex;gap:6px;padding:14px 20px 0;background:var(--paper);border-bottom:1px solid var(--line);flex-wrap:wrap; position:sticky; top:calc(64px + var(--sat)); z-index:19;}
   nav.tabs button{
     border:none;background:transparent;padding:10px 16px;font-size:13.5px;font-weight:600;
-    color:var(--muted);cursor:pointer;border-radius:8px 8px 0 0;position:relative;top:1px;
+    color:var(--muted);cursor:pointer;border-radius:2px 2px 0 0;position:relative;top:1px;
   }
   nav.tabs button.active{color:var(--navy);background:var(--card);border:1px solid var(--line);border-bottom:1px solid var(--card);}
 
@@ -56,8 +56,9 @@
   @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
 
   .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
-  .toolbar input[type=search]{padding:10px 14px;border:1px solid var(--line);border-radius:10px;flex:1;min-width:160px;font-size:14px;background:#fff;}
-  .btn{border:none;border-radius:10px;padding:10px 16px;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap;}
+  .toolbar input[type=search]{padding:10px 14px;border:1px solid var(--line);border-radius:4px;flex:1;min-width:160px;font-size:14px;background:#fff;}
+  .toolbar select.sortselect{padding:10px 12px;border:1px solid var(--line);border-radius:4px;font-size:13px;background:#fff;color:var(--ink);font-weight:600;}
+  .btn{border:none;border-radius:4px;padding:10px 16px;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap;}
   .btn-primary{background:var(--navy);color:#fff;}
   .btn-primary.green{background:var(--green);}
   .btn-primary.purple{background:var(--purple);}
@@ -77,14 +78,14 @@
   tbody tr:hover{background:#F0F4FA;}
   .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius);}
 
-  .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+  .badge{display:inline-block;padding:3px 9px;border-radius:3px;font-size:11px;font-weight:700;white-space:nowrap;}
   .badge.aktif{background:#DCEEE7;color:#1E6B52;}
   .badge.nonaktif{background:#F3E3DA;color:#A05A2C;}
   .badge.pasif{background:#EDEDED;color:#7a7a7a;}
   .badge.selesai{background:#DCEEE7;color:#1E6B52;}
   .badge.belummulai{background:#FCE8D6;color:#B3661B;}
   .rowactions{display:flex;gap:4px;}
-  .rowactions button{border:none;background:none;cursor:pointer;font-size:16px;padding:5px 7px;border-radius:8px;}
+  .rowactions button{border:none;background:none;cursor:pointer;font-size:16px;padding:5px 7px;border-radius:3px;}
   .rowactions button:active{background:var(--line);}
 
   .empty{padding:40px;text-align:center;color:var(--muted);font-size:13.5px;}
@@ -95,14 +96,14 @@
   .item-card .title{font-weight:700;font-size:14.5px;line-height:1.35;word-break:break-word;}
   .item-card .meta{font-size:12px;color:var(--muted);margin-top:3px;}
   .item-card .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
-  .item-card .chip{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:5px 9px;font-size:11.5px;color:var(--ink);}
+  .item-card .chip{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:5px 9px;font-size:11.5px;color:var(--ink);}
   .item-card .chip b{color:var(--muted);font-weight:600;margin-right:4px;}
   .item-card .actions{display:flex;gap:8px;margin-top:10px;}
-  .item-card .actions button{flex:1;border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px;font-size:12.5px;font-weight:600;}
+  .item-card .actions button{flex:1;border:1px solid var(--line);background:#fff;border-radius:4px;padding:8px;font-size:12.5px;font-weight:600;}
   .item-card .actions button.del{color:var(--danger);border-color:#f0d3d0;}
   .item-card .note{font-size:12px;color:var(--muted);margin-top:8px;border-top:1px dashed var(--line);padding-top:8px;}
 
-  dialog{border:none;border-radius:16px;padding:0;width:min(560px,94vw);max-height:88vh;box-shadow:0 20px 60px rgba(20,30,50,.25);}
+  dialog{border:none;border-radius:6px;padding:0;width:min(560px,94vw);max-height:88vh;box-shadow:0 20px 60px rgba(20,30,50,.25);}
   dialog::backdrop{background:rgba(15,25,45,.45);}
   .modal-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:2;}
   .modal-head h3{margin:0;font-size:16px;}
@@ -111,28 +112,22 @@
   form.modal-body label{display:flex;flex-direction:column;font-size:12px;font-weight:600;color:var(--muted);gap:5px;}
   form.modal-body label.full{grid-column:1/-1;}
   form.modal-body input, form.modal-body select, form.modal-body textarea{
-    padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:14px;font-family:inherit;color:var(--ink);width:100%;
+    padding:9px 11px;border:1px solid var(--line);border-radius:4px;font-size:14px;font-family:inherit;color:var(--ink);width:100%;
   }
   form.modal-body textarea{resize:none;min-height:40px;overflow:hidden;line-height:1.4;}
   form.modal-body input:focus, form.modal-body select:focus, form.modal-body textarea:focus{outline:2px solid var(--navy-lt);outline-offset:1px;}
 
-  .field-clear{position:relative;}
-  .field-clear textarea{padding-right:34px;}
-  .field-clear .clr{
-    position:absolute; right:5px; top:5px; width:26px; height:26px; border-radius:7px; border:none;
-    background:var(--paper); color:var(--muted); font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center;
-  }
-  .field-clear .clr:active{background:var(--line);}
-  .field-clear.is-none textarea{color:var(--muted); font-style:italic;}
+  select.petugas-select{cursor:pointer;}
+  select.petugas-select:invalid, select.petugas-select[value="-"]{color:var(--muted);}
 
   .modal-foot{padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:#fff;}
 
   .summary-cards{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
-  .summary-cards .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;flex:1;min-width:120px;}
+  .summary-cards .card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:14px 18px;flex:1;min-width:120px;}
   .summary-cards .card .n{font-size:22px;font-weight:800;color:var(--purple);}
   .summary-cards .card .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
 
-  .toast{position:fixed;bottom:calc(76px + var(--sab));left:50%;transform:translate(-50%,10px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:99;max-width:90vw;text-align:center;}
+  .toast{position:fixed;bottom:calc(76px + var(--sab));left:50%;transform:translate(-50%,10px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:4px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:99;max-width:90vw;text-align:center;}
   .toast.show{opacity:1;transform:translate(-50%,0);}
   .toast.err{background:var(--danger);}
 
@@ -151,7 +146,7 @@
     }
     nav.bottomnav button{
       border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;
-      font-size:10.5px;font-weight:700;color:var(--muted);padding:6px 10px;border-radius:10px;flex:1;
+      font-size:10.5px;font-weight:700;color:var(--muted);padding:6px 10px;border-radius:4px;flex:1;
     }
     nav.bottomnav button .ic{font-size:19px;}
     nav.bottomnav button.active{color:var(--navy); background:#EEF2FA;}
@@ -195,6 +190,12 @@
   <section class="panel active" id="panel-anggota">
     <div class="toolbar">
       <input type="search" id="searchAnggota" placeholder="Cari nama, kelas, atau divisi…">
+      <select id="sortAnggota" class="sortselect">
+        <option value="kelas-asc">Urutkan: Kelas (X → XII)</option>
+        <option value="kelas-desc">Urutkan: Kelas (XII → X)</option>
+        <option value="nama-asc">Urutkan: Nama (A → Z)</option>
+        <option value="nama-desc">Urutkan: Nama (Z → A)</option>
+      </select>
       <button class="btn btn-primary add-desktop" id="btnAddAnggota">+ Tambah Anggota</button>
     </div>
     <div class="tablewrap">
@@ -275,40 +276,18 @@
     <label>Tanggal<input type="date" name="tanggal"></label>
     <label>Kegiatan<textarea required name="kegiatan" rows="1" class="autogrow" placeholder="Nama acara/kegiatan"></textarea></label>
 
-    <label class="full">Petugas — ketuk ✕ pada kolom untuk menandai "tidak ada petugas" bila kamu tidak sengaja memilih nama.</label>
+    <label class="full">Petugas — pilih dari daftar anggota. Pilih "— Tidak ada petugas —" kalau tidak sengaja klik nama.</label>
 
-    <label class="field-clear">Nikon
-      <textarea name="nikon" rows="1" class="autogrow petugas" list="dlNama" placeholder="Nama petugas"></textarea>
-      <button type="button" class="clr" data-target="nikon" title="Tandai tidak ada petugas">✕</button>
-    </label>
-    <label class="field-clear">Canon
-      <textarea name="canon" rows="1" class="autogrow petugas" list="dlNama" placeholder="Nama petugas"></textarea>
-      <button type="button" class="clr" data-target="canon" title="Tandai tidak ada petugas">✕</button>
-    </label>
-    <label class="field-clear">Video (H)
-      <textarea name="videoH" rows="1" class="autogrow petugas" list="dlNama" placeholder="Nama petugas"></textarea>
-      <button type="button" class="clr" data-target="videoH" title="Tandai tidak ada petugas">✕</button>
-    </label>
-    <label class="field-clear">Video (V)
-      <textarea name="videoV" rows="1" class="autogrow petugas" list="dlNama" placeholder="Nama petugas"></textarea>
-      <button type="button" class="clr" data-target="videoV" title="Tandai tidak ada petugas">✕</button>
-    </label>
-    <label class="field-clear">Editor
-      <textarea name="editor" rows="1" class="autogrow petugas" list="dlNama" placeholder="Nama petugas"></textarea>
-      <button type="button" class="clr" data-target="editor" title="Tandai tidak ada petugas">✕</button>
-    </label>
-    <label class="field-clear">Designer
-      <textarea name="designer" rows="1" class="autogrow petugas" list="dlNama" placeholder="Nama petugas"></textarea>
-      <button type="button" class="clr" data-target="designer" title="Tandai tidak ada petugas">✕</button>
-    </label>
-    <label class="field-clear">Drive
-      <textarea name="drive" rows="1" class="autogrow petugas" list="dlNama" placeholder="Nama petugas"></textarea>
-      <button type="button" class="clr" data-target="drive" title="Tandai tidak ada petugas">✕</button>
-    </label>
+    <label>Nikon<select name="nikon" class="petugas-select"></select></label>
+    <label>Canon<select name="canon" class="petugas-select"></select></label>
+    <label>Video (H)<select name="videoH" class="petugas-select"></select></label>
+    <label>Video (V)<select name="videoV" class="petugas-select"></select></label>
+    <label>Editor<select name="editor" class="petugas-select"></select></label>
+    <label>Designer<select name="designer" class="petugas-select"></select></label>
+    <label>Drive<select name="drive" class="petugas-select"></select></label>
 
     <label>Status<select name="status" id="selStatusTugas"></select></label>
     <label class="full">Catatan<textarea name="catatan" rows="1" class="autogrow"></textarea></label>
-    <datalist id="dlNama"><option value="-">— Tidak ada petugas —</option></datalist>
     <div class="modal-foot">
       <button type="button" class="btn btn-ghost" data-close>Batal</button>
       <button type="submit" class="btn btn-primary green">Simpan</button>
@@ -405,26 +384,55 @@ function populateSelects(){
   document.getElementById('selDivisi').innerHTML = `<option value="">—</option>` + optHtml(STATE.lists.divisi);
   document.getElementById('selStatusAnggota').innerHTML = optHtml(STATE.lists.statusAnggota);
   document.getElementById('selStatusTugas').innerHTML = optHtml(STATE.lists.statusTugas);
-  document.getElementById('dlNama').innerHTML =
-    `<option value="-">— Tidak ada petugas —</option>` +
-    STATE.anggota.map(a=>`<option value="${a.nama}">`).join('');
+
+  const petugasOptHtml = `<option value="-">— Tidak ada petugas —</option>` +
+    STATE.anggota.map(a=>`<option value="${a.nama}">${a.nama}</option>`).join('');
+  document.querySelectorAll('#formPenugasan select.petugas-select').forEach(sel=>{
+    sel.innerHTML = petugasOptHtml;
+  });
 }
 
 function badgeStatusAnggota(s){
   const key = (s||'').toLowerCase().replace(/\s+/g,'');
   return `<span class="badge ${key}">${s||'-'}</span>`;
 }
+
+let ANGGOTA_SORT = 'kelas-asc';
+function kelasSortKey(kelas){
+  const s = String(kelas||'').toUpperCase();
+  const m = s.match(/^(X{1,3})-?([A-Z])?/);
+  if(!m) return 9999;
+  const tingkat = m[1] === 'XII' ? 12 : (m[1] === 'XI' ? 11 : (m[1] === 'X' ? 10 : 99));
+  const rombel = m[2] ? (m[2].charCodeAt(0) - 64) : 0;
+  return tingkat * 100 + rombel;
+}
+function sortAnggotaRows(rows){
+  const sorted = rows.slice();
+  switch(ANGGOTA_SORT){
+    case 'kelas-asc': sorted.sort((a,b)=> kelasSortKey(a.kelas) - kelasSortKey(b.kelas) || a.nama.localeCompare(b.nama)); break;
+    case 'kelas-desc': sorted.sort((a,b)=> kelasSortKey(b.kelas) - kelasSortKey(a.kelas) || a.nama.localeCompare(b.nama)); break;
+    case 'nama-asc': sorted.sort((a,b)=> a.nama.localeCompare(b.nama)); break;
+    case 'nama-desc': sorted.sort((a,b)=> b.nama.localeCompare(a.nama)); break;
+  }
+  return sorted;
+}
+document.getElementById('sortAnggota').addEventListener('change', e=>{
+  ANGGOTA_SORT = e.target.value;
+  renderAnggota(document.getElementById('searchAnggota').value);
+});
+
 function renderAnggota(filter){
   const f = (filter||'').toLowerCase();
-  const rows = STATE.anggota.filter(a =>
+  let rows = STATE.anggota.filter(a =>
     !f || [a.nama,a.kelas,a.divisi].join(' ').toLowerCase().includes(f)
   );
+  rows = sortAnggotaRows(rows);
 
   const tbody = document.getElementById('tbodyAnggota');
   if(!rows.length){ tbody.innerHTML = `<tr><td colspan="8" class="empty">Belum ada data anggota.</td></tr>`; }
-  else tbody.innerHTML = rows.map(a => `
+  else tbody.innerHTML = rows.map((a,i) => `
     <tr>
-      <td>${a.no}</td>
+      <td>${i+1}</td>
       <td><strong>${a.nama}</strong></td>
       <td>${a.kelas||'-'}</td>
       <td>${a.divisi||'-'}</td>
@@ -595,22 +603,6 @@ const dlgPenugasan = document.getElementById('dlgPenugasan');
 document.getElementById('btnAddPenugasan').addEventListener('click', ()=>openPenugasan(null));
 document.getElementById('fabPenugasan').addEventListener('click', ()=>openPenugasan(null));
 
-document.querySelectorAll('#formPenugasan .clr').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const name = btn.dataset.target;
-    const field = document.querySelector(`#formPenugasan [name="${name}"]`);
-    field.value = '-';
-    field.closest('.field-clear').classList.add('is-none');
-    autoGrow(field);
-    field.focus();
-  });
-});
-document.querySelectorAll('#formPenugasan .petugas').forEach(field=>{
-  field.addEventListener('input', ()=>{
-    field.closest('.field-clear').classList.toggle('is-none', field.value.trim() === '-');
-  });
-});
-
 function toInputDate(s){
   if(!s) return '';
   const m = String(s).match(/(\d{2})\/(\d{2})\/(\d{4})/);
@@ -625,14 +617,13 @@ function openPenugasan(row){
   if(data){
     form.tanggal.value = toInputDate(data.tanggal);
     form.kegiatan.value = data.kegiatan||'';
-    form.nikon.value = data.nikon||''; form.canon.value = data.canon||'';
-    form.videoH.value = data.videoH||''; form.videoV.value = data.videoV||'';
-    form.editor.value = data.editor||''; form.designer.value = data.designer||''; form.drive.value = data.drive||'';
+    form.nikon.value = data.nikon||'-'; form.canon.value = data.canon||'-';
+    form.videoH.value = data.videoH||'-'; form.videoV.value = data.videoV||'-';
+    form.editor.value = data.editor||'-'; form.designer.value = data.designer||'-'; form.drive.value = data.drive||'-';
     form.status.value = data.status||''; form.catatan.value = data.catatan||'';
+  } else {
+    form.querySelectorAll('select.petugas-select').forEach(sel=> sel.value = '-');
   }
-  form.querySelectorAll('.petugas').forEach(field=>{
-    field.closest('.field-clear').classList.toggle('is-none', field.value.trim() === '-');
-  });
   dlgPenugasan.showModal();
   autoGrowAllIn(form);
 }
