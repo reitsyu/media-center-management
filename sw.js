@@ -1,6 +1,6 @@
 // Minimal service worker: caches the app shell so the interface (not the
 // live sheet data) opens instantly and installs as a PWA on mobile.
-const CACHE = "mc-shell-v1";
+const CACHE = "mc-shell-v2";
 const SHELL = ["./", "./index.html", "./manifest.json", "./icons/icon-192.png", "./icons/icon-512.png"];
 
 self.addEventListener("install", (e) => {
