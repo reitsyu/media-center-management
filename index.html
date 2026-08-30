@@ -110,7 +110,10 @@
   .modal-head button{border:none;background:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px 8px;}
   form.modal-body{padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;overflow-y:auto;max-height:calc(88vh - 120px);}
   form.modal-body label{display:flex;flex-direction:column;font-size:12px;font-weight:600;color:var(--muted);gap:5px;}
+  form.modal-body .field{display:flex;flex-direction:column;font-size:12px;font-weight:600;color:var(--muted);gap:5px;}
+  form.modal-body .field-hint{font-size:11.5px;font-weight:500;color:var(--muted);margin:0 0 -4px;}
   form.modal-body label.full{grid-column:1/-1;}
+  form.modal-body .field.full{grid-column:1/-1;}
   form.modal-body input, form.modal-body select, form.modal-body textarea{
     padding:9px 11px;border:1px solid var(--line);border-radius:4px;font-size:14px;font-family:inherit;color:var(--ink);width:100%;
   }
@@ -281,14 +284,14 @@
     <label class="full">Nama<textarea required name="nama" rows="1" class="autogrow" placeholder="Nama lengkap"></textarea></label>
     <label>Kelas<select name="kelas" id="selKelas"></select></label>
     <label>Divisi<select name="divisi" id="selDivisi"></select></label>
-    <label class="full">Side Skill
+    <div class="field full">Side Skill
       <div class="tagselect" id="sideSkillTag" data-field="sideSkill">
         <div class="tag-chips"></div>
         <button type="button" class="tag-addbtn">+ Tambah skill</button>
         <div class="tag-panel"><div class="tag-list"></div></div>
       </div>
       <input type="hidden" name="sideSkill">
-    </label>
+    </div>
     <label>Status<select name="status" id="selStatusAnggota"></select></label>
     <label class="full">Catatan<textarea name="catatan" rows="1" class="autogrow"></textarea></label>
     <div class="modal-foot">
@@ -305,64 +308,64 @@
     <label>Tanggal<input type="date" name="tanggal"></label>
     <label>Kegiatan<textarea required name="kegiatan" rows="1" class="autogrow" placeholder="Nama acara/kegiatan"></textarea></label>
 
-    <label class="full">Petugas — pilih dari daftar anggota. Pilih "— Tidak ada petugas —" kalau tidak sengaja klik nama.</label>
+    <p class="full field-hint">Petugas — pilih dari daftar anggota. Bisa lebih dari satu orang per peran.</p>
 
-    <label class="full">Nikon
+    <div class="field full">Nikon
       <div class="tagselect multiselect" data-field="nikon">
         <div class="tag-chips"></div>
         <button type="button" class="tag-addbtn">+ Tambah petugas</button>
         <div class="tag-panel"><input type="search" class="tag-search" placeholder="Cari nama…"><div class="tag-list"></div></div>
       </div>
       <input type="hidden" name="nikon">
-    </label>
-    <label class="full">Canon
+    </div>
+    <div class="field full">Canon
       <div class="tagselect multiselect" data-field="canon">
         <div class="tag-chips"></div>
         <button type="button" class="tag-addbtn">+ Tambah petugas</button>
         <div class="tag-panel"><input type="search" class="tag-search" placeholder="Cari nama…"><div class="tag-list"></div></div>
       </div>
       <input type="hidden" name="canon">
-    </label>
-    <label class="full">Video (H)
+    </div>
+    <div class="field full">Video (H)
       <div class="tagselect multiselect" data-field="videoH">
         <div class="tag-chips"></div>
         <button type="button" class="tag-addbtn">+ Tambah petugas</button>
         <div class="tag-panel"><input type="search" class="tag-search" placeholder="Cari nama…"><div class="tag-list"></div></div>
       </div>
       <input type="hidden" name="videoH">
-    </label>
-    <label class="full">Video (V)
+    </div>
+    <div class="field full">Video (V)
       <div class="tagselect multiselect" data-field="videoV">
         <div class="tag-chips"></div>
         <button type="button" class="tag-addbtn">+ Tambah petugas</button>
         <div class="tag-panel"><input type="search" class="tag-search" placeholder="Cari nama…"><div class="tag-list"></div></div>
       </div>
       <input type="hidden" name="videoV">
-    </label>
-    <label class="full">Editor
+    </div>
+    <div class="field full">Editor
       <div class="tagselect multiselect" data-field="editor">
         <div class="tag-chips"></div>
         <button type="button" class="tag-addbtn">+ Tambah petugas</button>
         <div class="tag-panel"><input type="search" class="tag-search" placeholder="Cari nama…"><div class="tag-list"></div></div>
       </div>
       <input type="hidden" name="editor">
-    </label>
-    <label class="full">Designer
+    </div>
+    <div class="field full">Designer
       <div class="tagselect multiselect" data-field="designer">
         <div class="tag-chips"></div>
         <button type="button" class="tag-addbtn">+ Tambah petugas</button>
         <div class="tag-panel"><input type="search" class="tag-search" placeholder="Cari nama…"><div class="tag-list"></div></div>
       </div>
       <input type="hidden" name="designer">
-    </label>
-    <label class="full">Drive
+    </div>
+    <div class="field full">Drive
       <div class="tagselect multiselect" data-field="drive">
         <div class="tag-chips"></div>
         <button type="button" class="tag-addbtn">+ Tambah petugas</button>
         <div class="tag-panel"><input type="search" class="tag-search" placeholder="Cari nama…"><div class="tag-list"></div></div>
       </div>
       <input type="hidden" name="drive">
-    </label>
+    </div>
 
     <label>Status<select name="status" id="selStatusTugas"></select></label>
     <label class="full">Catatan<textarea name="catatan" rows="1" class="autogrow"></textarea></label>
