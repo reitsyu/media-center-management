@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1F3864">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Media Center">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png">
+<title>Media Center — Panel Kelola</title>
+<style>
+  :root{
+    --navy:#1F3864; --navy-lt:#2E5FA3;
+    --green:#1E6B52; --green-lt:#DCEEE7;
+    --purple:#5B3E8C; --purple-lt:#E8E0F2;
+    --ink:#1c2430; --paper:#F6F8FB; --line:#DDE4EE;
+    --card:#FFFFFF; --muted:#6b7688; --danger:#B3413A;
+    --radius:4px;
+    --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;background:var(--paper);color:var(--ink); overscroll-behavior-y:contain;}
+  body{padding-bottom:calc(64px + var(--sab));}
+
+  header{
+    background:linear-gradient(120deg,var(--navy),var(--navy-lt));
+    color:#fff; padding:calc(16px + var(--sat)) 20px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px;
+    position:sticky; top:0; z-index:20;
+  }
+  header .brand{display:flex; align-items:center; gap:10px;}
+  header .brand .logo{width:34px;height:34px;border-radius:3px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;}
+  header h1{margin:0;font-size:16px;letter-spacing:.2px;line-height:1.2;}
+  header .sub{font-size:11px;opacity:.75;margin-top:1px;}
+  #connStatus{font-size:11px;padding:5px 10px;border-radius:4px;background:rgba(255,255,255,.15);white-space:nowrap;}
+  #connStatus.ok{background:#2f8f5b;}
+  #connStatus.err{background:#b3413a;}
+
+  nav.tabs{display:flex;gap:6px;padding:14px 20px 0;background:var(--paper);border-bottom:1px solid var(--line);flex-wrap:wrap; position:sticky; top:calc(64px + var(--sat)); z-index:19;}
+  nav.tabs button{
+    border:none;background:transparent;padding:10px 16px;font-size:13.5px;font-weight:600;
+    color:var(--muted);cursor:pointer;border-radius:2px 2px 0 0;position:relative;top:1px;
+  }
+  nav.tabs button.active{color:var(--navy);background:var(--card);border:1px solid var(--line);border-bottom:1px solid var(--card);}
+
+  nav.bottomnav{display:none;}
+
+  main{padding:18px 16px 40px;max-width:1400px;margin:0 auto;}
+  section.panel{display:none;}
+  section.panel.active{display:block; animation:fadein .18s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
+  .toolbar input[type=search]{padding:10px 14px;border:1px solid var(--line);border-radius:4px;flex:1;min-width:160px;font-size:14px;background:#fff;}
+  .toolbar select.sortselect{display:none;}
+  .btn{border:none;border-radius:4px;padding:10px 16px;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap;}
+  .btn-primary{background:var(--navy);color:#fff;}
+  .btn-primary.green{background:var(--green);}
+  .btn-primary.purple{background:var(--purple);}
+  .btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink);}
+  .btn-danger{background:transparent;border:1px solid var(--danger);color:var(--danger);}
+  .btn:active{filter:brightness(.94);transform:scale(.98);}
+
+  table{width:100%;border-collapse:collapse;background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 3px rgba(20,30,50,.06);}
+  thead th{
+    background:var(--navy);color:#fff;text-align:left;font-size:11px;letter-spacing:.4px;
+    text-transform:uppercase;padding:11px 12px;white-space:nowrap;
+  }
+  #panel-penugasan thead th{background:var(--green);}
+  #panel-rekap thead th{background:var(--purple);}
+  tbody td{padding:10px 12px;font-size:13.5px;border-bottom:1px solid var(--line);vertical-align:top;}
+  tbody tr:nth-child(even){background:#FAFBFD;}
+  tbody tr:hover{background:#F0F4FA;}
+  .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius);}
+
+  .badge{display:inline-block;padding:3px 9px;border-radius:3px;font-size:11px;font-weight:700;white-space:nowrap;}
+  .badge.aktif{background:#DCEEE7;color:#1E6B52;}
+  .badge.nonaktif{background:#F3E3DA;color:#A05A2C;}
+  .badge.pasif{background:#EDEDED;color:#7a7a7a;}
+  .badge.selesai{background:#DCEEE7;color:#1E6B52;}
+  .badge.belummulai{background:#FCE8D6;color:#B3661B;}
+  .rowactions{display:flex;gap:4px;}
+  .rowactions button{border:none;background:none;cursor:pointer;font-size:16px;padding:5px 7px;border-radius:3px;}
+  .rowactions button:active{background:var(--line);}
+
+  .empty{padding:40px;text-align:center;color:var(--muted);font-size:13.5px;}
+
+  .cardlist{display:none;flex-direction:column;gap:10px;}
+  .item-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;box-shadow:0 1px 2px rgba(20,30,50,.04);}
+  .item-card .row1{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .item-card .title{font-weight:700;font-size:14.5px;line-height:1.35;word-break:break-word;}
+  .item-card .meta{font-size:12px;color:var(--muted);margin-top:3px;}
+  .item-card .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+  .item-card .chip{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:5px 9px;font-size:11.5px;color:var(--ink);}
+  .item-card .chip b{color:var(--muted);font-weight:600;margin-right:4px;}
+  .item-card .actions{display:flex;gap:8px;margin-top:10px;}
+  .item-card .actions button{flex:1;border:1px solid var(--line);background:#fff;border-radius:4px;padding:8px;font-size:12.5px;font-weight:600;}
+  .item-card .actions button.del{color:var(--danger);border-color:#f0d3d0;}
+  .item-card .note{font-size:12px;color:var(--muted);margin-top:8px;border-top:1px dashed var(--line);padding-top:8px;}
+
+  dialog{border:none;border-radius:6px;padding:0;width:min(560px,94vw);max-height:88vh;box-shadow:0 20px 60px rgba(20,30,50,.25);}
+  dialog::backdrop{background:rgba(15,25,45,.45);}
+  .modal-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:2;}
+  .modal-head h3{margin:0;font-size:16px;}
+  .modal-head button{border:none;background:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px 8px;}
+  form.modal-body{padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;overflow-y:auto;max-height:calc(88vh - 120px);}
+  form.modal-body label{display:flex;flex-direction:column;font-size:12px;font-weight:600;color:var(--muted);gap:5px;}
+  form.modal-body label.full{grid-column:1/-1;}
+  form.modal-body input, form.modal-body select, form.modal-body textarea{
+    padding:9px 11px;border:1px solid var(--line);border-radius:4px;font-size:14px;font-family:inherit;color:var(--ink);width:100%;
+  }
+  form.modal-body textarea{resize:none;min-height:40px;overflow:hidden;line-height:1.4;}
+  form.modal-body input:focus, form.modal-body select:focus, form.modal-body textarea:focus{outline:2px solid var(--navy-lt);outline-offset:1px;}
+
+  select.petugas-select{cursor:pointer;}
+  select.petugas-select:invalid, select.petugas-select[value="-"]{color:var(--muted);}
+
+  .modal-foot{padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:#fff;}
+
+  .summary-cards{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+  .summary-cards .card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:14px 18px;flex:1;min-width:120px;}
+  .summary-cards .card .n{font-size:22px;font-weight:800;color:var(--purple);}
+  .summary-cards .card .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
+
+  .toast{position:fixed;bottom:calc(76px + var(--sab));left:50%;transform:translate(-50%,10px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:4px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:99;max-width:90vw;text-align:center;}
+  .toast.show{opacity:1;transform:translate(-50%,0);}
+  .toast.err{background:var(--danger);}
+
+  .fab{
+    position:fixed; right:18px; bottom:calc(80px + var(--sab)); width:56px;height:56px;border-radius:50%;
+    background:var(--navy); color:#fff; font-size:26px; border:none; box-shadow:0 8px 20px rgba(31,56,100,.35);
+    display:none; align-items:center; justify-content:center; z-index:25; cursor:pointer;
+  }
+  #panel-penugasan .fab-p{background:var(--green);}
+
+  @media (max-width:760px){
+    nav.tabs{display:none;}
+    nav.bottomnav{
+      display:flex; position:fixed; left:0; right:0; bottom:0; background:#fff; border-top:1px solid var(--line);
+      padding:8px 6px calc(8px + var(--sab)); z-index:30; justify-content:space-around;
+    }
+    nav.bottomnav button{
+      border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;
+      font-size:10.5px;font-weight:700;color:var(--muted);padding:6px 10px;border-radius:4px;flex:1;
+    }
+    nav.bottomnav button .ic{font-size:19px;}
+    nav.bottomnav button.active{color:var(--navy); background:#EEF2FA;}
+    header{padding:calc(14px + var(--sat)) 16px 14px;}
+    header h1{font-size:14.5px;}
+    header .sub{display:none;}
+    main{padding:14px 12px 24px;}
+    .tablewrap{display:none;}
+    .cardlist{display:flex;}
+    .toolbar input[type=search]{font-size:16px;}
+    .btn.add-desktop{display:none;}
+    .fab{display:flex;}
+    form.modal-body{grid-template-columns:1fr;}
+  }
+  @media (min-width:761px){
+    .cardlist{display:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="logo">MC</div>
+    <div>
+      <h1>Media Center — Panel Kelola</h1>
+      <div class="sub">Anggota · Penugasan · Rekap — tersinkron dengan Google Sheets</div>
+    </div>
+  </div>
+  <div id="connStatus">memuat…</div>
+</header>
+
+<nav class="tabs">
+  <button data-tab="anggota" class="active">Anggota</button>
+  <button data-tab="penugasan">Penugasan</button>
+  <button data-tab="rekap">Rekap</button>
+</nav>
+
+<main>
+
+  <section class="panel active" id="panel-anggota">
+    <div class="toolbar">
+      <input type="search" id="searchAnggota" placeholder="Cari nama, kelas, atau divisi…">
+      <select id="sortAnggota" class="sortselect" hidden></select>
+      <button class="btn btn-ghost" id="btnReorderAnggota" title="Urutkan ulang baris di spreadsheet: Kelas XII→X, lalu Nama A→Z">↕ Urutkan Ulang</button>
+      <button class="btn btn-primary add-desktop" id="btnAddAnggota">+ Tambah Anggota</button>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th>No</th><th>Nama</th><th>Kelas</th><th>Divisi</th><th>Side Skill</th><th>Status</th><th>Catatan</th><th></th>
+        </tr></thead>
+        <tbody id="tbodyAnggota"><tr><td colspan="8" class="empty">Memuat data…</td></tr></tbody>
+      </table>
+    </div>
+    <div class="cardlist" id="cardAnggota"></div>
+    <button class="fab" id="fabAnggota">+</button>
+  </section>
+
+  <section class="panel" id="panel-penugasan">
+    <div class="toolbar">
+      <input type="search" id="searchPenugasan" placeholder="Cari kegiatan atau nama petugas…">
+      <button class="btn btn-primary green add-desktop" id="btnAddPenugasan">+ Tambah Penugasan</button>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th>No</th><th>Tanggal</th><th>Kegiatan</th><th>Nikon</th><th>Canon</th><th>Video H</th><th>Video V</th><th>Editor</th><th>Designer</th><th>Drive</th><th>Status</th><th>Catatan</th><th></th>
+        </tr></thead>
+        <tbody id="tbodyPenugasan"><tr><td colspan="13" class="empty">Memuat data…</td></tr></tbody>
+      </table>
+    </div>
+    <div class="cardlist" id="cardPenugasan"></div>
+    <button class="fab fab-p" id="fabPenugasan">+</button>
+  </section>
+
+  <section class="panel" id="panel-rekap">
+    <div class="summary-cards" id="rekapSummary"></div>
+    <div class="toolbar">
+      <input type="search" id="searchRekap" placeholder="Cari nama…">
+      <button class="btn btn-ghost" id="btnRefreshRekap">↻ Refresh</button>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th>No</th><th>Nama</th><th>Kelas</th><th>Divisi</th><th>Nikon</th><th>Canon</th><th>Video H</th><th>Video V</th><th>Editor</th><th>Designer</th><th>Drive</th><th>Total</th>
+        </tr></thead>
+        <tbody id="tbodyRekap"><tr><td colspan="12" class="empty">Memuat data…</td></tr></tbody>
+      </table>
+    </div>
+    <div class="cardlist" id="cardRekap"></div>
+  </section>
+
+</main>
+
+<nav class="bottomnav">
+  <button data-tab="anggota" class="active"><span class="ic">👥</span>Anggota</button>
+  <button data-tab="penugasan"><span class="ic">🗂️</span>Penugasan</button>
+  <button data-tab="rekap"><span class="ic">📊</span>Rekap</button>
+</nav>
+
+<dialog id="dlgAnggota">
+  <div class="modal-head"><h3 id="dlgAnggotaTitle">Tambah Anggota</h3><button type="button" data-close>✕</button></div>
+  <form class="modal-body" id="formAnggota">
+    <input type="hidden" name="_row">
+    <label class="full">Nama<textarea required name="nama" rows="1" class="autogrow" placeholder="Nama lengkap"></textarea></label>
+    <label>Kelas<select name="kelas" id="selKelas"></select></label>
+    <label>Divisi<select name="divisi" id="selDivisi"></select></label>
+    <label class="full">Side Skill<textarea name="sideSkill" rows="1" class="autogrow" placeholder="Contoh: Design, Videography"></textarea></label>
+    <label>Status<select name="status" id="selStatusAnggota"></select></label>
+    <label class="full">Catatan<textarea name="catatan" rows="1" class="autogrow"></textarea></label>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-ghost" data-close>Batal</button>
+      <button type="submit" class="btn btn-primary">Simpan</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgPenugasan">
+  <div class="modal-head"><h3 id="dlgPenugasanTitle">Tambah Penugasan</h3><button type="button" data-close>✕</button></div>
+  <form class="modal-body" id="formPenugasan">
+    <input type="hidden" name="_row">
+    <label>Tanggal<input type="date" name="tanggal"></label>
+    <label>Kegiatan<textarea required name="kegiatan" rows="1" class="autogrow" placeholder="Nama acara/kegiatan"></textarea></label>
+
+    <label class="full">Petugas — pilih dari daftar anggota. Pilih "— Tidak ada petugas —" kalau tidak sengaja klik nama.</label>
+
+    <label>Nikon<select name="nikon" class="petugas-select"></select></label>
+    <label>Canon<select name="canon" class="petugas-select"></select></label>
+    <label>Video (H)<select name="videoH" class="petugas-select"></select></label>
+    <label>Video (V)<select name="videoV" class="petugas-select"></select></label>
+    <label>Editor<select name="editor" class="petugas-select"></select></label>
+    <label>Designer<select name="designer" class="petugas-select"></select></label>
+    <label>Drive<select name="drive" class="petugas-select"></select></label>
+
+    <label>Status<select name="status" id="selStatusTugas"></select></label>
+    <label class="full">Catatan<textarea name="catatan" rows="1" class="autogrow"></textarea></label>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-ghost" data-close>Batal</button>
+      <button type="submit" class="btn btn-primary green">Simpan</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbxtKPl02hgRLv8S7UFGjU1_MIEP7Up5-g-pYwTfsxsscCVDyMiqJB6LN0obG3Gm0edM/exec";
+
+let STATE = { anggota: [], penugasan: [], rekap: [], lists: { divisi: [], statusAnggota: [], statusTugas: [], kelas: [] } };
+
+function toast(msg, isErr){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isErr ? ' err' : '');
+  setTimeout(()=> t.className='toast', 2500);
+}
+
+async function apiGet(action){
+  const res = await fetch(`${API_URL}?action=${action}`);
+  const json = await res.json();
+  if(!json.ok) throw new Error(json.error || 'Gagal memuat data');
+  return json.data;
+}
+async function apiPost(payload){
+  const res = await fetch(API_URL, {
+    method:'POST',
+    headers: {'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify(payload)
+  });
+  const json = await res.json();
+  if(!json.ok) throw new Error(json.error || 'Gagal menyimpan data');
+  return json;
+}
+
+function setConn(state, label){
+  const el = document.getElementById('connStatus');
+  el.className = state;
+  el.textContent = label;
+}
+
+function autoGrow(el){
+  el.style.height = 'auto';
+  el.style.height = (el.scrollHeight) + 'px';
+}
+document.addEventListener('input', e=>{
+  if(e.target.classList && e.target.classList.contains('autogrow')) autoGrow(e.target);
+});
+function autoGrowAllIn(container){
+  container.querySelectorAll('.autogrow').forEach(autoGrow);
+}
+
+function activateTab(tab){
+  document.querySelectorAll('nav.tabs button, nav.bottomnav button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  document.querySelectorAll('section.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+document.querySelectorAll('nav.tabs button, nav.bottomnav button').forEach(btn=>{
+  btn.addEventListener('click', ()=> activateTab(btn.dataset.tab));
+});
+
+async function loadAll(){
+  if(API_URL.includes('PASTE_URL_WEB_APP_DISINI')){
+    setConn('err','belum terhubung');
+    toast('Isi API_URL di index.html dengan URL Web App Apps Script kamu.', true);
+    return;
+  }
+  setConn('', 'menyambungkan…');
+  try{
+    const [lists, all] = await Promise.all([apiGet('lists'), apiGet('all')]);
+    STATE.lists = lists;
+    STATE.anggota = all.anggota;
+    STATE.penugasan = all.penugasan;
+    STATE.rekap = all.rekap;
+    populateSelects();
+    renderAnggota();
+    renderPenugasan();
+    renderRekap();
+    setConn('ok','tersambung');
+  }catch(err){
+    setConn('err','gagal tersambung');
+    toast(err.message, true);
+  }
+}
+
+function populateSelects(){
+  const optHtml = arr => arr.map(v=>`<option value="${v}">${v}</option>`).join('');
+  document.getElementById('selKelas').innerHTML = `<option value="">—</option>` + optHtml(STATE.lists.kelas);
+  document.getElementById('selDivisi').innerHTML = `<option value="">—</option>` + optHtml(STATE.lists.divisi);
+  document.getElementById('selStatusAnggota').innerHTML = optHtml(STATE.lists.statusAnggota);
+  document.getElementById('selStatusTugas').innerHTML = optHtml(STATE.lists.statusTugas);
+
+  const petugasOptHtml = `<option value="-">— Tidak ada petugas —</option>` +
+    STATE.anggota.map(a=>`<option value="${a.nama}">${a.nama}</option>`).join('');
+  document.querySelectorAll('#formPenugasan select.petugas-select').forEach(sel=>{
+    sel.innerHTML = petugasOptHtml;
+  });
+}
+
+function badgeStatusAnggota(s){
+  const key = (s||'').toLowerCase().replace(/\s+/g,'');
+  return `<span class="badge ${key}">${s||'-'}</span>`;
+}
+
+function kelasSortKey(kelas){
+  const s = String(kelas||'').toUpperCase();
+  const m = s.match(/^(X{1,3})-?([A-Z])?/);
+  if(!m) return -1;
+  const tingkat = m[1] === 'XII' ? 12 : (m[1] === 'XI' ? 11 : (m[1] === 'X' ? 10 : 0));
+  const rombel = m[2] ? (m[2].charCodeAt(0) - 64) : 0;
+  return tingkat * 100 + rombel;
+}
+// Urutan tampilan otomatis: Kelas XII → X, lalu Nama A → Z sebagai tiebreak.
+function sortAnggotaRows(rows){
+  return rows.slice().sort((a,b)=> kelasSortKey(b.kelas) - kelasSortKey(a.kelas) || (a.nama||'').localeCompare(b.nama||''));
+}
+document.getElementById('btnReorderAnggota').addEventListener('click', async ()=>{
+  const btn = document.getElementById('btnReorderAnggota');
+  btn.disabled = true; btn.textContent = 'Mengurutkan…';
+  try{
+    await apiPost({ table:'anggota', action:'reorder' });
+    toast('Baris di spreadsheet berhasil diurutkan ulang.');
+    await loadAll();
+  }catch(err){ toast(err.message, true); }
+  finally{ btn.disabled = false; btn.textContent = '↕ Urutkan Ulang'; }
+});
+
+function renderAnggota(filter){
+  const f = (filter||'').toLowerCase();
+  let rows = STATE.anggota.filter(a =>
+    !f || [a.nama,a.kelas,a.divisi].join(' ').toLowerCase().includes(f)
+  );
+  rows = sortAnggotaRows(rows);
+
+  const tbody = document.getElementById('tbodyAnggota');
+  if(!rows.length){ tbody.innerHTML = `<tr><td colspan="8" class="empty">Belum ada data anggota.</td></tr>`; }
+  else tbody.innerHTML = rows.map((a,i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td><strong>${a.nama}</strong></td>
+      <td>${a.kelas||'-'}</td>
+      <td>${a.divisi||'-'}</td>
+      <td>${a.sideSkill||'-'}</td>
+      <td>${badgeStatusAnggota(a.status)}</td>
+      <td>${a.catatan||'-'}</td>
+      <td class="rowactions">
+        <button title="Edit" onclick="openAnggota(${a._row})">✏️</button>
+        <button title="Hapus" onclick="deleteRow('anggota', ${a._row})">🗑️</button>
+      </td>
+    </tr>`).join('');
+
+  const card = document.getElementById('cardAnggota');
+  if(!rows.length){ card.innerHTML = `<div class="empty">Belum ada data anggota.</div>`; return; }
+  card.innerHTML = rows.map(a => `
+    <div class="item-card">
+      <div class="row1">
+        <div>
+          <div class="title">${a.nama}</div>
+          <div class="meta">${a.kelas||'-'} · ${a.divisi||'-'}</div>
+        </div>
+        ${badgeStatusAnggota(a.status)}
+      </div>
+      ${a.sideSkill ? `<div class="chips"><div class="chip"><b>Skill</b>${a.sideSkill}</div></div>` : ''}
+      ${a.catatan ? `<div class="note">${a.catatan}</div>` : ''}
+      <div class="actions">
+        <button onclick="openAnggota(${a._row})">✏️ Edit</button>
+        <button class="del" onclick="deleteRow('anggota', ${a._row})">🗑️ Hapus</button>
+      </div>
+    </div>`).join('');
+}
+document.getElementById('searchAnggota').addEventListener('input', e=>renderAnggota(e.target.value));
+
+function badgeStatusTugas(s){
+  const key = (s||'').toLowerCase().replace(/\s+/g,'');
+  return `<span class="badge ${key}">${s||'-'}</span>`;
+}
+function petugasChips(p){
+  const map = [['Nikon',p.nikon],['Canon',p.canon],['Video H',p.videoH],['Video V',p.videoV],['Editor',p.editor],['Designer',p.designer],['Drive',p.drive]];
+  return map.filter(([,v])=>v && v!=='-').map(([label,v])=>`<div class="chip"><b>${label}</b>${v}</div>`).join('');
+}
+function renderPenugasan(filter){
+  const f = (filter||'').toLowerCase();
+  const rows = STATE.penugasan.filter(p =>
+    !f || [p.kegiatan,p.nikon,p.canon,p.videoH,p.videoV,p.editor,p.designer,p.drive].join(' ').toLowerCase().includes(f)
+  );
+
+  const tbody = document.getElementById('tbodyPenugasan');
+  if(!rows.length){ tbody.innerHTML = `<tr><td colspan="13" class="empty">Belum ada penugasan.</td></tr>`; }
+  else tbody.innerHTML = rows.map(p => `
+    <tr>
+      <td>${p.no}</td>
+      <td>${p.tanggal||'-'}</td>
+      <td><strong>${p.kegiatan}</strong></td>
+      <td>${p.nikon||'-'}</td>
+      <td>${p.canon||'-'}</td>
+      <td>${p.videoH||'-'}</td>
+      <td>${p.videoV||'-'}</td>
+      <td>${p.editor||'-'}</td>
+      <td>${p.designer||'-'}</td>
+      <td>${p.drive||'-'}</td>
+      <td>${badgeStatusTugas(p.status)}</td>
+      <td>${p.catatan||'-'}</td>
+      <td class="rowactions">
+        <button title="Edit" onclick="openPenugasan(${p._row})">✏️</button>
+        <button title="Hapus" onclick="deleteRow('penugasan', ${p._row})">🗑️</button>
+      </td>
+    </tr>`).join('');
+
+  const card = document.getElementById('cardPenugasan');
+  if(!rows.length){ card.innerHTML = `<div class="empty">Belum ada penugasan.</div>`; return; }
+  card.innerHTML = rows.map(p => `
+    <div class="item-card">
+      <div class="row1">
+        <div>
+          <div class="title">${p.kegiatan}</div>
+          <div class="meta">${p.tanggal||'Tanggal belum diisi'}</div>
+        </div>
+        ${badgeStatusTugas(p.status)}
+      </div>
+      <div class="chips">${petugasChips(p) || '<div class="chip">Belum ada petugas ditugaskan</div>'}</div>
+      ${p.catatan ? `<div class="note">${p.catatan}</div>` : ''}
+      <div class="actions">
+        <button onclick="openPenugasan(${p._row})">✏️ Edit</button>
+        <button class="del" onclick="deleteRow('penugasan', ${p._row})">🗑️ Hapus</button>
+      </div>
+    </div>`).join('');
+}
+document.getElementById('searchPenugasan').addEventListener('input', e=>renderPenugasan(e.target.value));
+
+function renderRekap(filter){
+  const f = (filter||'').toLowerCase();
+  const rows = STATE.rekap.filter(r => !f || (r.nama||'').toLowerCase().includes(f));
+
+  const tbody = document.getElementById('tbodyRekap');
+  if(!rows.length){ tbody.innerHTML = `<tr><td colspan="12" class="empty">Belum ada data.</td></tr>`; }
+  else tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.no}</td><td><strong>${r.nama}</strong></td><td>${r.kelas||'-'}</td><td>${r.divisi||'-'}</td>
+      <td>${r.nikon||0}</td><td>${r.canon||0}</td><td>${r.videoH||0}</td><td>${r.videoV||0}</td>
+      <td>${r.editor||0}</td><td>${r.designer||0}</td><td>${r.drive||0}</td><td><strong>${r.total||0}</strong></td>
+    </tr>`).join('');
+
+  const card = document.getElementById('cardRekap');
+  if(!rows.length){ card.innerHTML = `<div class="empty">Belum ada data.</div>`; }
+  else card.innerHTML = rows.map(r => `
+    <div class="item-card">
+      <div class="row1">
+        <div>
+          <div class="title">${r.nama}</div>
+          <div class="meta">${r.kelas||'-'} · ${r.divisi||'-'}</div>
+        </div>
+        <div class="badge selesai">Total ${r.total||0}</div>
+      </div>
+      <div class="chips">
+        <div class="chip"><b>Nikon</b>${r.nikon||0}</div>
+        <div class="chip"><b>Canon</b>${r.canon||0}</div>
+        <div class="chip"><b>Video H</b>${r.videoH||0}</div>
+        <div class="chip"><b>Video V</b>${r.videoV||0}</div>
+        <div class="chip"><b>Editor</b>${r.editor||0}</div>
+        <div class="chip"><b>Designer</b>${r.designer||0}</div>
+        <div class="chip"><b>Drive</b>${r.drive||0}</div>
+      </div>
+    </div>`).join('');
+
+  const totalTugas = STATE.penugasan.length;
+  const totalAnggota = STATE.anggota.length;
+  const aktif = STATE.anggota.filter(a=>(a.status||'').toLowerCase()==='aktif').length;
+  document.getElementById('rekapSummary').innerHTML = `
+    <div class="card"><div class="n">${totalAnggota}</div><div class="l">Total Anggota</div></div>
+    <div class="card"><div class="n">${aktif}</div><div class="l">Anggota Aktif</div></div>
+    <div class="card"><div class="n">${totalTugas}</div><div class="l">Total Penugasan</div></div>
+  `;
+}
+document.getElementById('searchRekap').addEventListener('input', e=>renderRekap(e.target.value));
+document.getElementById('btnRefreshRekap').addEventListener('click', loadAll);
+
+const dlgAnggota = document.getElementById('dlgAnggota');
+document.getElementById('btnAddAnggota').addEventListener('click', ()=>openAnggota(null));
+document.getElementById('fabAnggota').addEventListener('click', ()=>openAnggota(null));
+function openAnggota(row){
+  const form = document.getElementById('formAnggota');
+  form.reset();
+  const data = row ? STATE.anggota.find(a=>a._row===row) : null;
+  document.getElementById('dlgAnggotaTitle').textContent = row ? 'Edit Anggota' : 'Tambah Anggota';
+  form._row.value = row || '';
+  if(data){
+    form.nama.value = data.nama||''; form.kelas.value = data.kelas||''; form.divisi.value = data.divisi||'';
+    form.sideSkill.value = data.sideSkill||''; form.status.value = data.status||''; form.catatan.value = data.catatan||'';
+  }
+  dlgAnggota.showModal();
+  autoGrowAllIn(form);
+}
+document.getElementById('formAnggota').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const f = e.target;
+  const namaInput = f.nama.value.trim();
+  const row = f._row.value;
+  const dup = STATE.anggota.some(a =>
+    a.nama.trim().toLowerCase() === namaInput.toLowerCase() && String(a._row) !== String(row)
+  );
+  if(dup){
+    toast(`"${namaInput}" sudah ada di daftar Anggota. Gunakan nama lain atau edit data yang sudah ada.`, true);
+    return;
+  }
+  const payloadData = { nama:namaInput, kelas:f.kelas.value, divisi:f.divisi.value, sideSkill:f.sideSkill.value, status:f.status.value, catatan:f.catatan.value };
+  try{
+    await apiPost({ table:'anggota', action: row ? 'update':'add', row: row ? Number(row): undefined, data: payloadData });
+    toast('Data anggota tersimpan.');
+    dlgAnggota.close();
+    loadAll();
+  }catch(err){ toast(err.message, true); }
+});
+
+const dlgPenugasan = document.getElementById('dlgPenugasan');
+document.getElementById('btnAddPenugasan').addEventListener('click', ()=>openPenugasan(null));
+document.getElementById('fabPenugasan').addEventListener('click', ()=>openPenugasan(null));
+
+function toInputDate(s){
+  if(!s) return '';
+  const m = String(s).match(/(\d{2})\/(\d{2})\/(\d{4})/);
+  return m ? `${m[3]}-${m[2]}-${m[1]}` : '';
+}
+function openPenugasan(row){
+  const form = document.getElementById('formPenugasan');
+  form.reset();
+  const data = row ? STATE.penugasan.find(p=>p._row===row) : null;
+  document.getElementById('dlgPenugasanTitle').textContent = row ? 'Edit Penugasan' : 'Tambah Penugasan';
+  form._row.value = row || '';
+  if(data){
+    form.tanggal.value = toInputDate(data.tanggal);
+    form.kegiatan.value = data.kegiatan||'';
+    form.nikon.value = data.nikon||'-'; form.canon.value = data.canon||'-';
+    form.videoH.value = data.videoH||'-'; form.videoV.value = data.videoV||'-';
+    form.editor.value = data.editor||'-'; form.designer.value = data.designer||'-'; form.drive.value = data.drive||'-';
+    form.status.value = data.status||''; form.catatan.value = data.catatan||'';
+  } else {
+    form.querySelectorAll('select.petugas-select').forEach(sel=> sel.value = '-');
+  }
+  dlgPenugasan.showModal();
+  autoGrowAllIn(form);
+}
+document.getElementById('formPenugasan').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const f = e.target;
+  const payloadData = {
+    tanggal:f.tanggal.value, kegiatan:f.kegiatan.value, nikon:f.nikon.value, canon:f.canon.value,
+    videoH:f.videoH.value, videoV:f.videoV.value, editor:f.editor.value, designer:f.designer.value,
+    drive:f.drive.value, status:f.status.value, catatan:f.catatan.value
+  };
+  const row = f._row.value;
+  try{
+    await apiPost({ table:'penugasan', action: row ? 'update':'add', row: row ? Number(row): undefined, data: payloadData });
+    toast('Penugasan tersimpan.');
+    dlgPenugasan.close();
+    loadAll();
+  }catch(err){ toast(err.message, true); }
+});
+
+async function deleteRow(table, row){
+  if(!confirm('Hapus data ini? Tindakan tidak bisa dibatalkan.')) return;
+  try{
+    await apiPost({ table, action:'delete', row });
+    toast('Data dihapus.');
+    loadAll();
+  }catch(err){ toast(err.message, true); }
+}
+
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click', ()=>b.closest('dialog').close()));
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+
+loadAll();
+</script>
+</body>
+</html>
