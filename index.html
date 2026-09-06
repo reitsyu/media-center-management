@@ -172,6 +172,13 @@
 
   /* Tugas: "nama ditambahkan = sudah selesai" cards */
   .tugaslist .item-card{border-left:3px solid var(--orange);}
+  /* Tugas has no desktop table fallback like the other tabs, so its card list
+     must always render (overrides the mobile-only .cardlist rules below). */
+  #panel-tugas .cardlist{
+    display:grid !important;
+    grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));
+    gap:14px;
+  }
   .selesai-chips{margin-top:10px;}
   .selesai-chips .tag-chip{background:var(--green-lt); color:var(--green);}
   .chip-empty{font-size:12px; color:var(--muted); font-style:italic;}
@@ -196,6 +203,7 @@
     main{padding:14px 12px 24px;}
     .tablewrap{display:none;}
     .cardlist{display:flex;}
+    #panel-tugas .cardlist{grid-template-columns:1fr;}
     .toolbar input[type=search]{font-size:16px;}
     .btn.add-desktop{display:none;}
     .fab{display:flex;}
