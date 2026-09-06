@@ -17,6 +17,7 @@
     --navy:#1F3864; --navy-lt:#2E5FA3;
     --green:#1E6B52; --green-lt:#DCEEE7;
     --purple:#5B3E8C; --purple-lt:#E8E0F2;
+    --orange:#B3661B; --orange-lt:#FCE8D6;
     --ink:#1c2430; --paper:#F6F8FB; --line:#DDE4EE;
     --card:#FFFFFF; --muted:#6b7688; --danger:#B3413A;
     --radius:4px;
@@ -62,6 +63,7 @@
   .btn-primary{background:var(--navy);color:#fff;}
   .btn-primary.green{background:var(--green);}
   .btn-primary.purple{background:var(--purple);}
+  .btn-primary.orange{background:var(--orange);}
   .btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink);}
   .btn-danger{background:transparent;border:1px solid var(--danger);color:var(--danger);}
   .btn:active{filter:brightness(.94);transform:scale(.98);}
@@ -166,6 +168,17 @@
     display:none; align-items:center; justify-content:center; z-index:25; cursor:pointer;
   }
   #panel-penugasan .fab-p{background:var(--green);}
+  #panel-tugas .fab-t{background:var(--orange);}
+
+  /* Tugas: checklist cards */
+  .tugaslist .item-card{border-left:3px solid var(--orange);}
+  .checklist{display:flex; flex-direction:column; gap:2px; margin-top:10px; border-top:1px dashed var(--line); padding-top:8px;}
+  .check-row{display:flex; align-items:center; gap:9px; padding:7px 2px; font-size:13.5px; cursor:pointer;}
+  .check-row input[type=checkbox]{width:18px; height:18px; accent-color:var(--orange); cursor:pointer; flex-shrink:0;}
+  .check-row.done span{color:var(--muted); text-decoration:line-through;}
+  .badge.progress-partial{background:var(--orange-lt); color:var(--orange);}
+  .badge.progress-done{background:var(--green-lt); color:var(--green);}
+  .badge.progress-none{background:#EDEDED; color:#7a7a7a;}
 
   @media (max-width:760px){
     nav.tabs{display:none;}
@@ -211,6 +224,7 @@
 <nav class="tabs">
   <button data-tab="anggota" class="active">Anggota</button>
   <button data-tab="penugasan">Penugasan</button>
+  <button data-tab="tugas">Tugas</button>
   <button data-tab="rekap">Rekap</button>
 </nav>
 
@@ -252,6 +266,16 @@
     <button class="fab fab-p" id="fabPenugasan">+</button>
   </section>
 
+  <section class="panel" id="panel-tugas">
+    <div class="summary-cards" id="tugasLeaderboard"></div>
+    <div class="toolbar">
+      <input type="search" id="searchTugas" placeholder="Cari judul tugas atau nama…">
+      <button class="btn btn-primary orange add-desktop" id="btnAddTugas">+ Tambah Tugas</button>
+    </div>
+    <div class="cardlist tugaslist" id="cardTugas"></div>
+    <button class="fab fab-t" id="fabTugas">+</button>
+  </section>
+
   <section class="panel" id="panel-rekap">
     <div class="summary-cards" id="rekapSummary"></div>
     <div class="toolbar">
@@ -274,6 +298,7 @@
 <nav class="bottomnav">
   <button data-tab="anggota" class="active"><span class="ic">👥</span>Anggota</button>
   <button data-tab="penugasan"><span class="ic">🗂️</span>Penugasan</button>
+  <button data-tab="tugas"><span class="ic">✅</span>Tugas</button>
   <button data-tab="rekap"><span class="ic">📊</span>Rekap</button>
 </nav>
 
@@ -376,12 +401,34 @@
   </form>
 </dialog>
 
+<dialog id="dlgTugas">
+  <div class="modal-head"><h3 id="dlgTugasTitle">Tambah Tugas</h3><button type="button" data-close>✕</button></div>
+  <form class="modal-body" id="formTugas">
+    <input type="hidden" name="_row">
+    <label class="full">Judul Tugas<textarea required name="judul" rows="1" class="autogrow" placeholder="Contoh: Edit video liputan HUT sekolah"></textarea></label>
+    <label>Tanggal<input type="date" name="tanggal"></label>
+    <div class="field full">Ditugaskan ke
+      <div class="tagselect multiselect" data-field="ditugaskan">
+        <div class="tag-chips"></div>
+        <button type="button" class="tag-addbtn">+ Tambah orang</button>
+        <div class="tag-panel"><input type="search" class="tag-search" placeholder="Cari nama…"><div class="tag-list"></div></div>
+      </div>
+      <input type="hidden" name="ditugaskan">
+    </div>
+    <label class="full">Catatan<textarea name="catatan" rows="1" class="autogrow" placeholder="Instruksi atau detail tambahan (opsional)"></textarea></label>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-ghost" data-close>Batal</button>
+      <button type="submit" class="btn btn-primary orange">Simpan</button>
+    </div>
+  </form>
+</dialog>
+
 <div class="toast" id="toast"></div>
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbxtKPl02hgRLv8S7UFGjU1_MIEP7Up5-g-pYwTfsxsscCVDyMiqJB6LN0obG3Gm0edM/exec";
 
-let STATE = { anggota: [], penugasan: [], rekap: [], lists: { divisi: [], statusAnggota: [], statusTugas: [], kelas: [] } };
+let STATE = { anggota: [], penugasan: [], tugas: [], rekap: [], lists: { divisi: [], statusAnggota: [], statusTugas: [], kelas: [] } };
 
 function toast(msg, isErr){
   const t = document.getElementById('toast');
@@ -447,10 +494,12 @@ async function loadAll(){
     STATE.lists = lists;
     STATE.anggota = all.anggota;
     STATE.penugasan = all.penugasan;
+    STATE.tugas = all.tugas || [];
     STATE.rekap = all.rekap;
     populateSelects();
     renderAnggota();
     renderPenugasan();
+    renderTugas();
     renderRekap();
     setConn('ok','tersambung');
   }catch(err){
@@ -599,6 +648,148 @@ function renderPenugasan(filter){
     </div>`).join('');
 }
 document.getElementById('searchPenugasan').addEventListener('input', e=>renderPenugasan(e.target.value));
+
+/* ======================= TUGAS: progress helpers ======================= */
+function parseProgress(str){
+  const map = {};
+  String(str||'').split('|').map(s=>s.trim()).filter(Boolean).forEach(pair=>{
+    const idx = pair.lastIndexOf(':');
+    if(idx === -1) return;
+    const name = pair.slice(0, idx).trim();
+    const status = pair.slice(idx+1).trim();
+    if(name) map[name] = status === '1';
+  });
+  return map;
+}
+function stringifyProgress(map){
+  return Object.entries(map).map(([name,done]) => `${name}:${done ? 1 : 0}`).join('|');
+}
+function assignedNamesOf(t){
+  return String(t.assigned||'').split(',').map(s=>s.trim()).filter(Boolean);
+}
+function escapeAttr(s){
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+async function toggleTugasProgress(row, nama, checked){
+  const t = STATE.tugas.find(x=>x._row===row);
+  if(!t) return;
+  const map = parseProgress(t.progress);
+  map[nama] = checked;
+  const newProgress = stringifyProgress(map);
+  t.progress = newProgress; // optimistic local update
+  renderTugas(document.getElementById('searchTugas').value);
+  try{
+    await apiPost({ table:'tugas', action:'update', row, data:{ progress:newProgress } });
+  }catch(err){
+    toast(err.message, true);
+    loadAll();
+  }
+}
+
+function renderTugas(filter){
+  const f = (filter||'').toLowerCase();
+  const rows = STATE.tugas.filter(t =>
+    !f || [t.judul, t.assigned].join(' ').toLowerCase().includes(f)
+  );
+  const wrap = document.getElementById('cardTugas');
+  if(!rows.length){ wrap.innerHTML = `<div class="empty">Belum ada tugas yang diberikan.</div>`; }
+  else wrap.innerHTML = rows.map(t=>{
+    const names = assignedNamesOf(t);
+    const progress = parseProgress(t.progress);
+    const doneCount = names.filter(n=>progress[n]).length;
+    const badgeClass = doneCount===0 ? 'progress-none' : (doneCount===names.length ? 'progress-done' : 'progress-partial');
+    const checklistHtml = names.length
+      ? names.map(n => `
+          <label class="check-row ${progress[n] ? 'done' : ''}">
+            <input type="checkbox" ${progress[n] ? 'checked' : ''} onchange="toggleTugasProgress(${t._row}, '${escapeAttr(n)}', this.checked)">
+            <span>${n}</span>
+          </label>`).join('')
+      : `<div class="empty" style="padding:10px 0;">Belum ada yang ditugaskan.</div>`;
+    return `
+      <div class="item-card">
+        <div class="row1">
+          <div>
+            <div class="title">${t.judul}</div>
+            <div class="meta">${t.tanggal || 'Tanggal belum diisi'}</div>
+          </div>
+          <span class="badge ${badgeClass}">${doneCount}/${names.length} selesai</span>
+        </div>
+        <div class="checklist">${checklistHtml}</div>
+        ${t.catatan ? `<div class="note">${t.catatan}</div>` : ''}
+        <div class="actions">
+          <button onclick="openTugas(${t._row})">✏️ Edit</button>
+          <button class="del" onclick="deleteRow('tugas', ${t._row})">🗑️ Hapus</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  renderTugasLeaderboard();
+}
+document.getElementById('searchTugas').addEventListener('input', e=>renderTugas(e.target.value));
+
+function renderTugasLeaderboard(){
+  const counts = {};
+  STATE.tugas.forEach(t=>{
+    const map = parseProgress(t.progress);
+    assignedNamesOf(t).forEach(n=>{
+      if(!counts[n]) counts[n] = { done:0, total:0 };
+      counts[n].total++;
+      if(map[n]) counts[n].done++;
+    });
+  });
+  const top = Object.entries(counts)
+    .map(([name,c]) => ({ name, ...c }))
+    .sort((a,b)=> b.done - a.done || b.total - a.total)
+    .slice(0, 5);
+  const el = document.getElementById('tugasLeaderboard');
+  el.innerHTML = top.length
+    ? top.map(r => `<div class="card"><div class="n">${r.done}/${r.total}</div><div class="l">${r.name}</div></div>`).join('')
+    : '';
+}
+
+const dlgTugas = document.getElementById('dlgTugas');
+document.getElementById('btnAddTugas').addEventListener('click', ()=>openTugas(null));
+document.getElementById('fabTugas').addEventListener('click', ()=>openTugas(null));
+function openTugas(row){
+  const form = document.getElementById('formTugas');
+  form.reset();
+  const data = row ? STATE.tugas.find(t=>t._row===row) : null;
+  document.getElementById('dlgTugasTitle').textContent = row ? 'Edit Tugas' : 'Tambah Tugas';
+  form._row.value = row || '';
+  if(data){
+    form.judul.value = data.judul || '';
+    form.tanggal.value = toInputDate(data.tanggal);
+    form.catatan.value = data.catatan || '';
+  }
+  tagPickers.ditugaskan.setSelected(data ? data.assigned : '');
+  dlgTugas.showModal();
+  autoGrowAllIn(form);
+}
+document.getElementById('formTugas').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const f = e.target;
+  const row = f._row.value;
+  const existing = row ? STATE.tugas.find(t=>t._row===Number(row)) : null;
+  const assignedNames = f.ditugaskan.value.split(',').map(s=>s.trim()).filter(Boolean);
+  const prevProgress = existing ? parseProgress(existing.progress) : {};
+  const newProgressMap = {};
+  assignedNames.forEach(n => { newProgressMap[n] = prevProgress[n] || false; });
+
+  const payloadData = {
+    judul: f.judul.value,
+    tanggal: f.tanggal.value,
+    assigned: f.ditugaskan.value,
+    catatan: f.catatan.value,
+    progress: stringifyProgress(newProgressMap)
+  };
+  try{
+    await apiPost({ table:'tugas', action: row ? 'update':'add', row: row ? Number(row): undefined, data: payloadData });
+    toast('Tugas tersimpan.');
+    dlgTugas.close();
+    loadAll();
+  }catch(err){ toast(err.message, true); }
+});
 
 function renderRekap(filter){
   const f = (filter||'').toLowerCase();
