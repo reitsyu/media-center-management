@@ -435,21 +435,47 @@ function toast(msg, isErr){
   setTimeout(()=> t.className='toast', 2500);
 }
 
-async function apiGet(action){
-  const res = await fetch(`${API_URL}?action=${action}`);
-  const json = await res.json();
-  if(!json.ok) throw new Error(json.error || 'Gagal memuat data');
-  return json.data;
+async function apiGet(action, opts){
+  return _fetchWithRetry(`${API_URL}?action=${action}`, { method:'GET' }, opts);
 }
 async function apiPost(payload){
-  const res = await fetch(API_URL, {
+  // Writes are not retried automatically — retrying a POST that actually
+  // succeeded server-side (but whose response got lost) could double-write.
+  return _fetchWithRetry(API_URL, {
     method:'POST',
-    headers: {'Content-Type':'text/plain;charset=utf-8'},
+    headers: {'Content-Type':'text/plain;charset=utf-8'}, // avoids CORS preflight on Apps Script
     body: JSON.stringify(payload)
-  });
-  const json = await res.json();
-  if(!json.ok) throw new Error(json.error || 'Gagal menyimpan data');
-  return json;
+  }, { retries: 0, timeoutMs: 20000 });
+}
+
+// Fetch with a timeout (so a hung request doesn't leave the UI stuck on
+// "menyambungkan..." forever) and automatic retries with backoff for
+// transient failures (cold starts, brief network blips).
+async function _fetchWithRetry(url, fetchOpts, opts){
+  const retries = (opts && opts.retries != null) ? opts.retries : 2;
+  const timeoutMs = (opts && opts.timeoutMs) || 12000;
+  let lastErr;
+  for(let attempt = 0; attempt <= retries; attempt++){
+    const controller = new AbortController();
+    const timer = setTimeout(()=>controller.abort(), timeoutMs);
+    try{
+      const res = await fetch(url, { ...fetchOpts, signal: controller.signal });
+      clearTimeout(timer);
+      if(!res.ok) throw new Error(`Server merespons dengan status ${res.status}`);
+      const json = await res.json();
+      if(!json.ok) throw new Error(json.error || 'Gagal memuat data');
+      return json.data !== undefined ? json.data : json;
+    }catch(err){
+      clearTimeout(timer);
+      lastErr = err.name === 'AbortError' ? new Error('Waktu tunggu habis, mencoba lagi…') : err;
+      if(attempt < retries){
+        if(typeof setConn === 'function') setConn('', `mencoba lagi… (${attempt+1}/${retries})`);
+        await new Promise(r => setTimeout(r, 700 * (attempt+1))); // simple backoff
+        continue;
+      }
+    }
+  }
+  throw lastErr;
 }
 
 function setConn(state, label){
@@ -488,12 +514,12 @@ async function loadAll(){
   }
   setConn('', 'menyambungkan…');
   try{
-    const [lists, all] = await Promise.all([apiGet('lists'), apiGet('all')]);
-    STATE.lists = lists;
-    STATE.anggota = all.anggota;
-    STATE.penugasan = all.penugasan;
-    STATE.tugas = all.tugas || [];
-    STATE.rekap = all.rekap;
+    const boot = await apiGet('bootstrap');
+    STATE.lists = boot.lists;
+    STATE.anggota = boot.anggota;
+    STATE.penugasan = boot.penugasan;
+    STATE.tugas = boot.tugas || [];
+    STATE.rekap = boot.rekap;
     populateSelects();
     renderAnggota();
     renderPenugasan();
